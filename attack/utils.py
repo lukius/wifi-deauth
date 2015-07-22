@@ -56,6 +56,7 @@ class ChannelFinder(object):
         freq_bytes = radiotap_header.notdecoded[offset:offset+2]    
         freq = struct.unpack('h', freq_bytes)[0]
         
+        # Only valid for 2.4 GHz frequency ranges!
         if freq == 2484:
             channel = 14
         else:
