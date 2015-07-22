@@ -106,6 +106,7 @@ class SniffedClientDeauthAttack(WiFiDeauthAttack):
     def __init__(self, interface, bssid, timeout):
         super(SniffedClientDeauthAttack, self).__init__(interface, bssid)
         self.timeout = timeout
+        self.clients = set()
 
     def _is_valid(self, address):
         # Filter client addresses by discarding broadcast addresses as well as
@@ -132,9 +133,11 @@ class SniffedClientDeauthAttack(WiFiDeauthAttack):
         return clients
 
     def _do_run(self):
-        # First get client addresses by sniffing the network.
-        clients = self._get_client_addresses()
+        # First get client addresses by sniffing the network. Avoid computing
+        # this if it was already done in previous executions.
+        if not self.clients:
+            self.clients = self._get_client_addresses()
         
         # Now launch the attack against these clients.
-        attack = FixedClientDeauthAttack(self.interface, self.bssid, clients)
+        attack = FixedClientDeauthAttack(self.interface, self.bssid, self.clients)
         attack._do_run()
