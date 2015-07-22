@@ -67,8 +67,11 @@ class ChannelFinder(object):
     
 class WiFiInterface(object):
     
-    def __init__(self, interface_name):
-        self.interface_name = interface_name
+    def __init__(self, interface):
+        if isinstance(interface, self.__class__):
+            self.interface_name = interface.get_name()
+        else:
+            self.interface_name = interface
         
     def get_name(self):
         return self.interface_name

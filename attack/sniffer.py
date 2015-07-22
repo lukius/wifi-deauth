@@ -43,7 +43,12 @@ class WiFiSniffer(object):
             # Yield sniffed packets while the timeout supplied does not
             # expire. The sniffer thread will automatically die once
             # this time elapses.
-            yield self.packet_queue.get(timeout=1)
+            try:
+                packet = self.packet_queue.get(timeout=1)
+            except Queue.Empty:
+                continue
+            else:
+                yield packet
     
         while not self.packet_queue.empty() and not self.stopped:
             # Finally, yield remaining packets, if any.

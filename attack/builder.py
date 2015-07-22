@@ -1,5 +1,5 @@
-from impl import SingleClientDeauthAttack,\
-                 MultipleClientDeauthAttack,\
+from impl import FixedClientDeauthAttack,\
+                 SniffedClientDeauthAttack,\
                  GlobalDisassociationAttack
 
 
@@ -30,7 +30,7 @@ class WiFiDeauthAttackWrapper(object):
         return attack.run()
         
         
-class SingleClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
+class FixedClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
     
     @classmethod
     def handles(cls, options):
@@ -40,7 +40,7 @@ class SingleClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
         interface = self.options.interface
         bssid = self.options.bssid
         client = self.options.client
-        return SingleClientDeauthAttack(interface, bssid, client)
+        return FixedClientDeauthAttack(interface, bssid, [client])
     
     
 class GlobalDisassociationAttackWrapper(WiFiDeauthAttackWrapper):
@@ -55,7 +55,7 @@ class GlobalDisassociationAttackWrapper(WiFiDeauthAttackWrapper):
         return GlobalDisassociationAttack(interface, bssid)    
     
     
-class MultipleClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
+class SniffedClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
     
     @classmethod
     def handles(cls, options):
@@ -65,4 +65,4 @@ class MultipleClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
         interface = self.options.interface
         bssid = self.options.bssid
         timeout = self.options.timeout
-        return MultipleClientDeauthAttack(interface, bssid, timeout)   
+        return SniffedClientDeauthAttack(interface, bssid, timeout)   
