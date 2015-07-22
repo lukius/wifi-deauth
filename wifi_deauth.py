@@ -24,8 +24,23 @@ def parse_options():
     parser.add_argument("-t", "--timeout", action="store", dest="timeout",
                         default=60, type=int,
                         help="number of seconds to sniff packets (defaults to 60; only meaningful if -s is used)")
+
+    parser.add_argument("-e", "--executions", action="store", dest="executions",
+                        default=1, type=int,
+                        help="number of attack executions to perform (defaults to 1)")
     
-    return parser.parse_args()
+    parser.add_argument("-p", "--persistence_times", action="store", dest="persistence_times",
+                        default=None, type=int, nargs=2,
+                        help="min and max number of seconds to wait between attack executions, separated by spaces (defaults to 5,10)")    
+    
+    options = parser.parse_args()
+
+    if options.persistence_times is None:
+        options.persistence_times = [5,10]
+    elif options.persistence_times[0] > options.persistence_times[1]:
+        options.persistence_times = options.persistence_times[::-1]
+    
+    return options
 
 def main():
     options = parse_options()

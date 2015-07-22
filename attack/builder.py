@@ -27,7 +27,9 @@ class WiFiDeauthAttackWrapper(object):
         
     def run(self):
         attack = self._get_attack_implementor()
-        return attack.run()
+        executions = self.options.executions
+        persistence_times = self.options.persistence_times
+        return attack.run(executions, persistence_times)
         
         
 class FixedClientDeauthAttackWrapper(WiFiDeauthAttackWrapper):
