@@ -3,6 +3,7 @@ import struct
 
 from scapy.all import RadioTap
 
+from exceptions import AttackException
 from sniffer import WiFiSniffer
 
 
@@ -32,13 +33,21 @@ class ChannelFinder(object):
         packets = sniffer.sniff(timeout=self.DEFAULT_TIMEOUT,
                                 lfilter=lambda pkt: pkt.haslayer(RadioTap) and\
                                                     pkt.addr3 == self.bssid)
+        channel_packet = None
+        
         # Find a packet containing channel information.
         for packet in packets:
             if self._packet_has_channel_info(packet[RadioTap]):
-                sniffer.stop()
+                channel_packet = packet[RadioTap]
+                break
+            
+        sniffer.stop()
+                
+        if channel_packet is None:
+            raise AttackException('Failed to find AP channel!')
                 
         # Extract channel from radiotap header.
-        return self._extract_channel_from(packet[RadioTap])
+        return self._extract_channel_from(channel_packet)
     
     def _packet_has_channel_info(self, radiotap_header):
         return radiotap_header.present & self.CHANNEL_FLAG != 0
@@ -81,5 +90,6 @@ class WiFiInterface(object):
                    % (self.interface_name, channel)
         exit_code = os.system(command)
         if exit_code != 0:
-            raise Exception('Failed to set channel %d on interface %s!' %\
-                            (channel, self.interface_name))
+            msg = 'Failed to set channel %d on interface %s!' %\
+                   (channel, self.interface_name)
+            raise AttackException(msg)

@@ -2,6 +2,8 @@ import logging
 
 from argparse import ArgumentParser
 
+from attack.exceptions import AttackException
+
 
 def parse_options():
     parser = ArgumentParser()
@@ -55,7 +57,11 @@ def main():
     logging.getLogger('scapy.runtime').setLevel(logging.ERROR)    
     from attack.builder import WiFiDeauthAttackBuilder
     attack = WiFiDeauthAttackBuilder.build_from(options)
-    attack.run()
+    
+    try:
+        attack.run()
+    except AttackException, e:
+        logging.log(logging.CRITICAL, e.message)
 
 
 if __name__ == '__main__':

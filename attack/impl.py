@@ -28,7 +28,9 @@ class WiFiDeauthAttack(object):
     def run(self, executions, persistence_times):
         # First, retrieve the channel used by the target AP in order to
         # configure the wireless interface so it can inject deauth packets.
+        self._log('Finding channel in use by AP %s...' % self.bssid)
         channel = ChannelFinder(self.interface, self.bssid).find()
+        self._log('Done. Using channel %d.' % channel)
         self.interface.set_channel(channel)
 
         # Finally, run the attack as many times as requested.
