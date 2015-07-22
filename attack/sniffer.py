@@ -37,6 +37,7 @@ class WiFiSniffer(object):
         # function, which is blocking.
         sniffer_thread = threading.Thread(target=self._do_sniff,
                                           args=(timeout,lfilter))
+        sniffer_thread.setDaemon(True)
         sniffer_thread.start()
         
         while sniffer_thread.is_alive() and not self.stopped:

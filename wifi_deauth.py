@@ -31,7 +31,10 @@ def parse_options():
     
     parser.add_argument("-p", "--persistence_times", action="store", dest="persistence_times",
                         default=None, type=int, nargs=2,
-                        help="min and max number of seconds to wait between attack executions, separated by spaces (defaults to 5,10)")    
+                        help="min and max number of seconds to wait between attack executions, separated by spaces (defaults to 5,10)")
+    
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
+                        help="increase detail level of information printed out by the application")    
     
     options = parser.parse_args()
 
@@ -39,6 +42,9 @@ def parse_options():
         options.persistence_times = [5,10]
     elif options.persistence_times[0] > options.persistence_times[1]:
         options.persistence_times = options.persistence_times[::-1]
+        
+    logging_level = logging.DEBUG if options.verbose else logging.CRITICAL    
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging_level)        
     
     return options
 

