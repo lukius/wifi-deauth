@@ -45,15 +45,16 @@ def parse_options():
     elif options.persistence_times[0] > options.persistence_times[1]:
         options.persistence_times = options.persistence_times[::-1]
         
-    logging_level = logging.DEBUG if options.verbose else logging.CRITICAL    
-    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging_level)        
+    logging_level = logging.DEBUG if options.verbose else logging.CRITICAL
+    logging.basicConfig(format='%(levelname)s: %(message)s',
+                        level=logging_level)
     
     return options
 
 def main():
     options = parse_options()
-    # To suppress Scapy warning messages (import has to be done after the
-    # following line).
+    # This is to suppress Scapy warning messages (import has to be done after
+    # the following line).
     logging.getLogger('scapy.runtime').setLevel(logging.ERROR)    
     from attack.builder import WiFiDeauthAttackBuilder
     attack = WiFiDeauthAttackBuilder.build_from(options)

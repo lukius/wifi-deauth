@@ -5,6 +5,9 @@ from impl import FixedClientDeauthAttack,\
 
 class WiFiDeauthAttackBuilder(object):
     
+    '''This object finds the appropriate attack for the options supplied by the
+    user.'''
+    
     @classmethod
     def build_from(cls, options):
         subclasses = WiFiDeauthAttackWrapper.__subclasses__()

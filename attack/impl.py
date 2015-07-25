@@ -78,6 +78,10 @@ class WiFiDeauthAttack(object):
 
 class FixedClientDeauthAttack(WiFiDeauthAttack):
     
+    '''This attack injects two deauthentication packets coming from and sent to
+    each of the client MAC addresses provided as argument. This is then retried
+    as many times as NUM_PROBES specifies.'''
+    
     def __init__(self, interface, bssid, clients):
         super(FixedClientDeauthAttack, self).__init__(interface, bssid)
         self.clients = clients
@@ -103,6 +107,10 @@ class FixedClientDeauthAttack(WiFiDeauthAttack):
 
 class GlobalDisassociationAttack(WiFiDeauthAttack):
     
+    '''This attack will inject broadcast disassociation and deauthentication
+    packets having as source the BSSID provided. However, it is not as
+    effective as the standard deauth attack against a single target.'''
+    
     def _do_run(self):
         msg = 'Injecting disassociation and deauth packets sent to broadcast address %s...' %\
                self.WIFI_BROADCAST_ADDRESS
@@ -118,6 +126,10 @@ class GlobalDisassociationAttack(WiFiDeauthAttack):
 
 
 class SniffedClientDeauthAttack(WiFiDeauthAttack):
+    
+    '''This attack consists in sniffing the network so as to retrieve MAC
+    addresses of potential clients of the given access point. Once this is
+    done, a standard fixed deauth attack against every client will be run.'''
 
     def __init__(self, interface, bssid, timeout):
         super(SniffedClientDeauthAttack, self).__init__(interface, bssid)
